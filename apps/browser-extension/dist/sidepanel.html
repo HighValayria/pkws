@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PKWS 微信读书笔记</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">PKWS</div>
+        <h1>读书笔记</h1>
+      </div>
+      <div class="top-actions">
+        <span id="connectionDot" class="dot" aria-hidden="true"></span>
+        <button id="settingsButton" class="icon-button" type="button" aria-label="连接设置" title="连接设置">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9m4 0h3M4 12h3m4 0h9M4 17h9m4 0h3M15 4v6M9 9v6m6-1v6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section id="sourceCard" class="source-card">
+      <button id="sourceToggle" class="source-toggle" type="button" aria-expanded="true" aria-controls="sourceDetails" aria-label="收起当前来源">
+        <span class="source-toggle-copy">
+          <span class="source-label">当前来源</span>
+          <span id="sourceSummary" class="source-summary" hidden>正在读取页面…</span>
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div id="sourceDetails" class="source-details">
+        <div id="sourceTitle" class="source-title">正在读取页面…</div>
+        <div id="sourceMeta" class="source-meta"></div>
+        <a id="sourceLink" class="source-link" href="#" target="_blank" rel="noreferrer" hidden>打开当前来源 ↗</a>
+      </div>
+    </section>
+
+    <section id="driftWarning" class="warning" hidden>
+      <div><strong>页面已经变化</strong><span>草稿仍绑定原来的书或章节；可直接按原来源保存，或主动改绑。</span></div>
+      <button id="rebindButton" type="button">改绑到当前页</button>
+    </section>
+
+    <section class="editor">
+      <div class="section-heading">
+        <label for="commentInput">我的笔记</label>
+      </div>
+      <textarea id="commentInput" placeholder="写下想法，支持 Markdown…" spellcheck="false"></textarea>
+    </section>
+
+    <footer class="footer">
+      <div id="statusText" class="status" role="status">草稿会自动保存在浏览器本地</div>
+      <button id="saveButton" class="primary-button" type="button">保存到今天</button>
+    </footer>
+  </main>
+
+  <aside id="settingsPanel" class="settings" hidden>
+    <div class="settings-head">
+      <div><div class="eyebrow">本地连接</div><h2>桌面端配对</h2></div>
+      <button id="closeSettingsButton" class="icon-button" type="button" aria-label="关闭">×</button>
+    </div>
+    <p id="connectionText" class="settings-copy"></p>
+    <div id="pairingForm">
+      <label for="pairingCodeInput">6 位配对码</label>
+      <input id="pairingCodeInput" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000">
+      <button id="pairButton" class="primary-button wide" type="button">连接桌面端</button>
+      <p class="hint">在 PKWS 桌面端右上角设置中生成。凭证仅保存在本扩展中。</p>
+    </div>
+    <button id="forgetButton" class="secondary-button wide" type="button" hidden>解除本机配对</button>
+  </aside>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

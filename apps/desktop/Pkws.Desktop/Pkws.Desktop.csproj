@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>PKWS</AssemblyName>
+    <RootNamespace>Pkws.Desktop</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../../../src/Pkws.Core/Pkws.Core.csproj" />
+    <ProjectReference Include="../../../src/Pkws.Api/Pkws.Api.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pkws.local/contracts/capture-v1.schema.json",
+  "title": "PKWS Capture Request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "request_id", "source_type", "content"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "request_id": { "type": "string", "format": "uuid" },
+    "entry_id": { "type": ["string", "null"], "format": "uuid" },
+    "source_type": { "enum": ["desktop", "weread"] },
+    "content": { "type": "string", "maxLength": 1048576 },
+    "occurred_at": { "type": ["string", "null"], "format": "date-time" },
+    "source_context": { "$ref": "#/$defs/source_context" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "source_type": { "const": "desktop" } } },
+      "then": { "properties": { "content": { "minLength": 1 } } }
+    },
+    {
+      "if": { "properties": { "source_type": { "const": "weread" } } },
+      "then": {
+        "required": ["source_context"],
+        "anyOf": [
+          { "properties": { "content": { "minLength": 1 } } },
+          { "properties": { "source_context": { "properties": { "selected_text": { "type": "string", "minLength": 1 } }, "required": ["selected_text"] } } }
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "source_context": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": ["string", "null"], "maxLength": 100 },
+        "work_id": { "type": ["string", "null"], "maxLength": 256 },
+        "work_title": { "type": ["string", "null"], "maxLength": 500 },
+        "authors": { "type": "array", "maxItems": 20, "items": { "type": "string", "maxLength": 200 } },
+        "chapter_id": { "type": ["string", "null"], "maxLength": 256 },
+        "chapter_title": { "type": ["string", "null"], "maxLength": 500 },
+        "url": { "type": ["string", "null"], "format": "uri", "maxLength": 4096 },
+        "selected_text": { "type": ["string", "null"], "maxLength": 131072 },
+        "selection_prefix": { "type": ["string", "null"], "maxLength": 1000 },
+        "selection_suffix": { "type": ["string", "null"], "maxLength": 1000 },
+        "captured_at": { "type": ["string", "null"], "format": "date-time" },
+        "extractor_version": { "type": ["string", "null"], "maxLength": 100 }
+      }
+    }
+  }
+}

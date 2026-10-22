@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="src/Pkws.Core/Pkws.Core.csproj" />
+  <Project Path="src/Pkws.Api/Pkws.Api.csproj" />
+  <Project Path="src/Pkws.Agent/Pkws.Agent.csproj" />
+  <Project Path="apps/agent/Pkws.Agent.Cli/Pkws.Agent.Cli.csproj" />
+  <Project Path="apps/desktop/Pkws.Desktop/Pkws.Desktop.csproj" />
+  <Project Path="tests/Pkws.Tests/Pkws.Tests.csproj" />
+</Solution>

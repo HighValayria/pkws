@@ -1,0 +1,159 @@
+openapi: 3.1.0
+info:
+  title: PKWS Local Capture API
+  version: 1.1.0
+  description: Loopback-only append API. Health and one-time extension pairing are unauthenticated; capture endpoints require a Bearer token.
+servers:
+  - url: http://127.0.0.1:27123
+paths:
+  /v1/health:
+    get:
+      security: []
+      responses:
+        '200':
+          description: Service is available without leaking local paths.
+  /v1/context:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Capture service capabilities and configured time zone.
+  /v1/pairings:
+    post:
+      security: []
+      description: Exchange a user-visible, short-lived desktop pairing code for an origin-bound extension credential.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PairingRequest' }
+      responses:
+        '200':
+          description: Pairing completed. The access token is returned only in this response.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PairingResponse' }
+        '400': { $ref: '#/components/responses/ApiError' }
+        '401': { $ref: '#/components/responses/ApiError' }
+        '403': { $ref: '#/components/responses/ApiError' }
+        '503': { $ref: '#/components/responses/ApiError' }
+  /v1/captures:
+    post:
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CaptureRequest' }
+      responses:
+        '200':
+          description: The entry was committed, or an identical request was already committed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaptureResponse' }
+        '400': { $ref: '#/components/responses/ApiError' }
+        '401': { $ref: '#/components/responses/ApiError' }
+        '403': { $ref: '#/components/responses/ApiError' }
+        '409': { $ref: '#/components/responses/ApiError' }
+        '503': { $ref: '#/components/responses/ApiError' }
+  /v1/captures/{requestId}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Current ledger status.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CaptureStatus' }
+        '404': { $ref: '#/components/responses/ApiError' }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    ApiError:
+      description: Stable machine-readable error.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+  schemas:
+    CaptureRequest:
+      type: object
+      additionalProperties: false
+      required: [schema_version, request_id, source_type, content]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        request_id: { type: string, format: uuid }
+        entry_id: { type: [string, 'null'], format: uuid }
+        source_type: { type: string, enum: [desktop, weread] }
+        content:
+          type: string
+          maxLength: 1048576
+          description: Desktop captures require non-blank content. WeRead captures may use an empty comment only when selected_text is non-blank.
+        occurred_at: { type: [string, 'null'], format: date-time }
+        source_context: { $ref: '#/components/schemas/SourceContext' }
+    SourceContext:
+      type: [object, 'null']
+      additionalProperties: false
+      properties:
+        provider: { type: [string, 'null'], maxLength: 100 }
+        work_id: { type: [string, 'null'], maxLength: 256 }
+        work_title: { type: [string, 'null'], maxLength: 500 }
+        authors: { type: array, maxItems: 20, items: { type: string, maxLength: 200 } }
+        chapter_id: { type: [string, 'null'], maxLength: 256 }
+        chapter_title: { type: [string, 'null'], maxLength: 500 }
+        url: { type: [string, 'null'], format: uri, maxLength: 4096 }
+        selected_text: { type: [string, 'null'], maxLength: 131072 }
+        selection_prefix: { type: [string, 'null'], maxLength: 1000 }
+        selection_suffix: { type: [string, 'null'], maxLength: 1000 }
+        captured_at: { type: [string, 'null'], format: date-time }
+        extractor_version: { type: [string, 'null'], maxLength: 100 }
+    PairingRequest:
+      type: object
+      additionalProperties: false
+      required: [code, extension_id]
+      properties:
+        code: { type: string, pattern: '^[0-9]{6}$' }
+        extension_id: { type: string, pattern: '^[a-p]{32}$' }
+    PairingResponse:
+      type: object
+      additionalProperties: false
+      required: [schema_version, access_token, extension_id]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        access_token: { type: string, minLength: 32 }
+        extension_id: { type: string, pattern: '^[a-p]{32}$' }
+    CaptureResponse:
+      type: object
+      required: [schema_version, request_id, entry_id, status, created_at, local_date, relative_path, duplicate]
+      properties:
+        schema_version: { type: integer, const: 1 }
+        request_id: { type: string, format: uuid }
+        entry_id: { type: string, format: uuid }
+        status: { type: string, const: committed }
+        created_at: { type: string, format: date-time }
+        local_date: { type: string, format: date }
+        relative_path: { type: string }
+        duplicate: { type: boolean }
+    CaptureStatus:
+      type: object
+      required: [request_id, entry_id, status]
+      properties:
+        request_id: { type: string, format: uuid }
+        entry_id: { type: string, format: uuid }
+        status: { type: string, enum: [received, writing, committed, recoverable, failed] }
+        error_code: { type: [string, 'null'] }
+        relative_path: { type: [string, 'null'] }
+    ApiError:
+      type: object
+      required: [code, message, retryable]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        retryable: { type: boolean }

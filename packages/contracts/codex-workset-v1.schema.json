@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pkws.local/schemas/codex-workset-v1.schema.json",
+  "title": "PKWS Codex Workset v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workset_id", "run_type", "created_at", "instructions", "fragments", "topics", "articles"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "workset_id": { "type": "string", "format": "uuid" },
+    "run_type": { "enum": ["daily", "weekly", "monthly", "topic"] },
+    "topic_name": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "instructions": { "type": "array", "items": { "type": "string" } },
+    "fragments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fragment_id", "source_revision_id", "source_type", "source_path", "text", "existing_topics", "existing_epistemic_status"],
+        "properties": {
+          "fragment_id": { "type": "string", "format": "uuid" },
+          "source_revision_id": { "type": "string", "format": "uuid" },
+          "source_type": { "type": "string" },
+          "source_path": { "type": "string" },
+          "created_at": { "type": ["string", "null"], "format": "date-time" },
+          "text": { "type": "string" },
+          "existing_topics": { "type": "array", "items": { "type": "string" } },
+          "existing_epistemic_status": { "type": "string" },
+          "source_context": { "type": ["object", "null"] }
+        }
+      }
+    },
+    "topics": { "type": "array", "items": { "type": "object" } },
+    "articles": { "type": "array", "items": { "type": "object" } }
+  }
+}

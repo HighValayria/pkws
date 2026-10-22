@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "PKWS · 微信读书笔记",
+  "description": "把微信读书笔记和来源信息可靠保存到本机 PKWS。",
+  "version": "0.1.2",
+  "minimum_chrome_version": "114",
+  "permissions": ["sidePanel", "storage", "tabs"],
+  "host_permissions": [
+    "https://weread.qq.com/*",
+    "http://127.0.0.1:27123/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "打开 PKWS 笔记"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://weread.qq.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

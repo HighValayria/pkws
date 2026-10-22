@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pkws.local/schemas/codex-submission-v1.schema.json",
+  "title": "PKWS Codex Submission v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "workset_id", "analyses", "topic_candidates", "changes"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "workset_id": { "type": "string", "format": "uuid" },
+    "analyses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["fragment_id", "topics", "entities", "epistemic_status", "action", "rationale"],
+        "properties": {
+          "fragment_id": { "type": "string", "format": "uuid" },
+          "topics": { "type": "array", "items": { "type": "string" } },
+          "entities": { "type": "array", "items": { "type": "string" } },
+          "epistemic_status": { "enum": ["user_view", "external_quote", "mixed", "unknown"] },
+          "action": { "enum": ["index_only", "topic_candidate", "create_article", "revise_article"] },
+          "rationale": { "type": "string" }
+        }
+      }
+    },
+    "topic_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "direction", "fragment_ids"],
+        "properties": {
+          "name": { "type": "string" },
+          "direction": { "type": "string" },
+          "fragment_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
+        }
+      }
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["change_type", "rationale", "source_revision_ids"],
+        "properties": {
+          "change_type": { "enum": ["create_article", "revise_article", "weekly_review", "monthly_review"] },
+          "topic_name": { "type": ["string", "null"] },
+          "article_id": { "type": ["string", "null"], "format": "uuid" },
+          "title": { "type": ["string", "null"] },
+          "markdown_body": { "type": ["string", "null"] },
+          "rationale": { "type": "string" },
+          "source_revision_ids": { "type": "array", "items": { "type": "string", "format": "uuid" }, "minItems": 1 },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["find", "replace", "reason"],
+              "properties": {
+                "find": { "type": "string", "minLength": 1 },
+                "replace": { "type": "string" },
+                "reason": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
